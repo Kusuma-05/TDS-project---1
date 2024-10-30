@@ -1,1 +1,758 @@
-
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "5b8aa3b0",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from bs4 import BeautifulSoup\n",
+    "import requests"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "8ccdae43",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import openpyxl\n",
+    "excel=openpyxl.Workbook()\n",
+    "sheet=excel.active\n",
+    "sheet.title='Scraped Data USA Senate'\n",
+    "sheet.append(['Person_Name','State_Name','Party_Name','Vote'])\n",
+    "try:\n",
+    "    source=requests.get(\"https://www.senate.gov/legislative/LIS/roll_call_votes/vote1171/vote_117_1_00094.htm#state\")\n",
+    "    source.raise_for_status()\n",
+    "    soup=BeautifulSoup(source.text,'html.parser')\n",
+    "    lists=soup.find_all('div',class_=\"contenttext\")\n",
+    "    names=soup.find_all('div',class_=\"contenttext responsive_col\")\n",
+    "    i=0\n",
+    "    while i<150 :\n",
+    "        k=2\n",
+    "        j=i+1\n",
+    "        while k>0:\n",
+    "            State_name=names[i].text.split(':')[0].strip()\n",
+    "            Vote=names[j].text.split(',')[1].strip()\n",
+    "            Person_Name=names[j].text.split(',')[0].split('(')[0].strip()\n",
+    "            Party_Name=names[j].text.split(',')[0].split('(')[1].split('-')[0].strip()\n",
+    "            sheet.append([Person_Name,State_name,Party_Name,Vote])\n",
+    "            k=k-1\n",
+    "            j=j+1\n",
+    "        i=i+3\n",
+    "    #for name in names:\n",
+    "     #   State_Name=name.b.text\n",
+    "     #   if len(State)!=3 and State!=\"Not Voting\":\n",
+    "           \n",
+    "        \n",
+    "    \n",
+    "            \n",
+    "except Exception as e:\n",
+    "    print(e)\n",
+    "excel.save('USA Senate Scraped Data.xlsx')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "42229327",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import pandas as pd\n",
+    "ans={}"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "846762e6",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pd.DataFrame(pd.read_excel(\"/Users/deep/USA Senate Scraped Data.xlsx\"))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "bde37a0b",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Person_Name</th>\n",
+       "      <th>State_Name</th>\n",
+       "      <th>Party_Name</th>\n",
+       "      <th>Vote</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>Shelby</td>\n",
+       "      <td>Alabama</td>\n",
+       "      <td>R</td>\n",
+       "      <td>Yea</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>Tuberville</td>\n",
+       "      <td>Alabama</td>\n",
+       "      <td>R</td>\n",
+       "      <td>Yea</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>Murkowski</td>\n",
+       "      <td>Alaska</td>\n",
+       "      <td>R</td>\n",
+       "      <td>Yea</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>Sullivan</td>\n",
+       "      <td>Alaska</td>\n",
+       "      <td>R</td>\n",
+       "      <td>Not Voting</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>Kelly</td>\n",
+       "      <td>Arizona</td>\n",
+       "      <td>D</td>\n",
+       "      <td>Nay</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>...</th>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>95</th>\n",
+       "      <td>Manchin</td>\n",
+       "      <td>West Virginia</td>\n",
+       "      <td>D</td>\n",
+       "      <td>Yea</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>96</th>\n",
+       "      <td>Baldwin</td>\n",
+       "      <td>Wisconsin</td>\n",
+       "      <td>D</td>\n",
+       "      <td>Nay</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>97</th>\n",
+       "      <td>Johnson</td>\n",
+       "      <td>Wisconsin</td>\n",
+       "      <td>R</td>\n",
+       "      <td>Yea</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>98</th>\n",
+       "      <td>Barrasso</td>\n",
+       "      <td>Wyoming</td>\n",
+       "      <td>R</td>\n",
+       "      <td>Yea</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>99</th>\n",
+       "      <td>Lummis</td>\n",
+       "      <td>Wyoming</td>\n",
+       "      <td>R</td>\n",
+       "      <td>Yea</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>100 rows × 4 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   Person_Name     State_Name Party_Name        Vote\n",
+       "0       Shelby        Alabama          R         Yea\n",
+       "1   Tuberville        Alabama          R         Yea\n",
+       "2    Murkowski         Alaska          R         Yea\n",
+       "3     Sullivan         Alaska          R  Not Voting\n",
+       "4        Kelly        Arizona          D         Nay\n",
+       "..         ...            ...        ...         ...\n",
+       "95     Manchin  West Virginia          D         Yea\n",
+       "96     Baldwin      Wisconsin          D         Nay\n",
+       "97     Johnson      Wisconsin          R         Yea\n",
+       "98    Barrasso        Wyoming          R         Yea\n",
+       "99      Lummis        Wyoming          R         Yea\n",
+       "\n",
+       "[100 rows x 4 columns]"
+      ]
+     },
+     "execution_count": 5,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "ad255460",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "0\n"
+     ]
+    }
+   ],
+   "source": [
+    "#Q.1 How many democrats did not vote?\n",
+    "res=df[df['Party_Name']=='D']['Vote']\n",
+    "cnt=0\n",
+    "for i in res:\n",
+    "    if i=='Not Voting':\n",
+    "        cnt=cnt+1\n",
+    "print(cnt)\n",
+    "ans[1]=cnt"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "7752c82a",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "49\n"
+     ]
+    }
+   ],
+   "source": [
+    "#Q.2 How many republicans voted Yea?\n",
+    "ans[2]=df[df['Party_Name']=='R']['Vote'].value_counts()[0]\n",
+    "print(ans[2])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "id": "2f013cbf",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "6\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "/Users/deep/opt/anaconda3/lib/python3.9/site-packages/pandas/core/indexing.py:1724: SettingWithCopyWarning: \n",
+      "A value is trying to be set on a copy of a slice from a DataFrame\n",
+      "\n",
+      "See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy\n",
+      "  self._setitem_with_indexer_missing(indexer, value)\n",
+      "/var/folders/p7/ngcssct148s8rbrbrthk7fb80000gn/T/ipykernel_48883/4221474415.py:8: SettingWithCopyWarning: \n",
+      "A value is trying to be set on a copy of a slice from a DataFrame\n",
+      "\n",
+      "See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy\n",
+      "  ans[3]=cnt\n"
+     ]
+    }
+   ],
+   "source": [
+    "#Q.3 What's the total number of Yea votes from all senators whose name starts with \"B\"?\n",
+    "ans=(df[df['Vote']==\"Yea\"]['Person_Name'])\n",
+    "cnt=0\n",
+    "for i in ans:\n",
+    "    if i[0]=='B':\n",
+    "        cnt=cnt+1\n",
+    "print(cnt)\n",
+    "ans[3]=cnt"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "b561e884",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "29\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "/Users/deep/opt/anaconda3/lib/python3.9/site-packages/pandas/core/series.py:1056: SettingWithCopyWarning: \n",
+      "A value is trying to be set on a copy of a slice from a DataFrame\n",
+      "\n",
+      "See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy\n",
+      "  cacher_needs_updating = self._check_is_chained_assignment_possible()\n"
+     ]
+    }
+   ],
+   "source": [
+    "#Q.4 How many states voted all Yay?\n",
+    "Res=((df[df['Vote']==\"Yea\"]['State_Name']))\n",
+    "res=(len(set(Res)))\n",
+    "print(res)\n",
+    "ans[4]=res"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "id": "187530c3",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Q.5 How many states had at least 1 non-voting senator?\n",
+    "ans[5]=df['Vote'].value_counts()[2]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "id": "adb9a525",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "22\n"
+     ]
+    }
+   ],
+   "source": [
+    "#Q.6 How many states have both Republican senators?\n",
+    "lists=df[df['Party_Name']=='R']['State_Name']\n",
+    "dic={}\n",
+    "cnt=0\n",
+    "for i in lists:\n",
+    "    if i  in dic.keys():\n",
+    "        dic[i]=dic[i]+1\n",
+    "    else:\n",
+    "        dic[i]=1\n",
+    "for i,j in dic.items():\n",
+    "    if j==2:\n",
+    "        cnt=cnt+1\n",
+    "print(cnt)\n",
+    "    \n",
+    "ans[6]=cnt\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "id": "a371a3e0",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Q.7 How many states have both Republican and Democrat senators?\n",
+    "ans[7]=(pd.get_dummies(df,columns=['Party_Name']).groupby(['State_Name']).sum()).query('Party_Name_R == 1 & Party_Name_D == 1').shape[0]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "id": "9dac2595",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "6\n"
+     ]
+    }
+   ],
+   "source": [
+    "#Q.8 How many Senators have their names starting with W?\n",
+    "res=df['Person_Name']\n",
+    "cnt=0\n",
+    "for i in res:\n",
+    "    if i[0][0]=='W':\n",
+    "        cnt=cnt+1\n",
+    "print(cnt)\n",
+    "ans[8]=cnt"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "id": "0994f8f5",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Q.9 What is the votes ratio of Democrats' major decision to Republican's major decision ? \n",
+    "major_decision = pd.crosstab(df['Party_Name'],df['Vote']).max(axis = 1).loc[['D','R']].values\n",
+    "ans[9]=round(major_decision[0] / major_decision[1],4)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "id": "28a088d4",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Q.10 What is the highest absolute difference in percentage between yea and nay senators among the different parties? \n",
+    "import numpy as np\n",
+    "nayyea = pd.crosstab(df['Party_Name'],df['Vote']).astype(float)\n",
+    "ph = abs(nayyea.Yea - nayyea.Nay)/nayyea.Yea\n",
+    "maximum = 0\n",
+    "for i in ph:\n",
+    "    if i not in [np.nan,np.infty] and i > maximum:\n",
+    "        maximum = i\n",
+    "        \n",
+    "ans[10]=str(round(maximum,4)*100) + '%'"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 16,
+   "id": "1951bd90",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "3\n"
+     ]
+    }
+   ],
+   "source": [
+    "#Q.11 How many Democrats voted Yea?\n",
+    "res=df[df['Party_Name']=='D']['Vote'].value_counts()[1]\n",
+    "print(res)\n",
+    "ans[11]=res"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "id": "2e4430d6",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "26\n"
+     ]
+    }
+   ],
+   "source": [
+    " #Q.12 How many states voted all Nay?\n",
+    "tns=set(df[df['Vote']=='Nay']['State_Name'])\n",
+    "rem=(len(tns))\n",
+    "print(rem)\n",
+    "ans[12]=rem"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 18,
+   "id": "21bc8c90",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "21\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Q.13 How many states have both Democrat senators?\n",
+    "lists=df[df['Party_Name']=='D']['State_Name']\n",
+    "dic={}\n",
+    "cnt=0\n",
+    "for i in lists:\n",
+    "    if i  in dic.keys():\n",
+    "        dic[i]=dic[i]+1\n",
+    "    else:\n",
+    "        dic[i]=1\n",
+    "for i,j in dic.items():\n",
+    "    if j==2:\n",
+    "        cnt=cnt+1\n",
+    "print(cnt)\n",
+    "ans[13]=cnt"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 19,
+   "id": "586268fc",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "1\n"
+     ]
+    }
+   ],
+   "source": [
+    "#Q.14 How many senators did not vote?\n",
+    "res=df['Vote'].value_counts()[2]\n",
+    "print(res)\n",
+    "ans[14]=res"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 20,
+   "id": "e59b4053",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "1\n"
+     ]
+    }
+   ],
+   "source": [
+    "#Q.15 How many states had at least 1 senator not voted?\n",
+    "res=df['Vote'].value_counts()[2]\n",
+    "print(res)\n",
+    "ans[15]=res"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 21,
+   "id": "2d1ad174",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "25.0\n"
+     ]
+    }
+   ],
+   "source": [
+    "#Q.16 Ratio of number of rows to the number of columns in your dataset?\n",
+    "ratio=df.shape[0]/df.shape[1]\n",
+    "print(ratio)\n",
+    "ans[16]=ratio"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "id": "2609b585",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import csv\n",
+    "\n",
+    "answers = []\n",
+    "for i in range(1,17):\n",
+    "    answers.append(['Q'+str(i),ans[i]])\n",
+    "        \n",
+    "\n",
+    "filename = \"TDS_PROJECT-1.csv\"\n",
+    "\n",
+    "with open(filename, 'w',newline='') as csvfile:  \n",
+    "    csvwriter = csv.writer(csvfile,dialect='excel') \n",
+    "    csvwriter.writerows(answers)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 26,
+   "id": "5e35126d",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Person_Name</th>\n",
+       "      <th>State_Name</th>\n",
+       "      <th>Party_Name</th>\n",
+       "      <th>Vote</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>Shelby</td>\n",
+       "      <td>Alabama</td>\n",
+       "      <td>R</td>\n",
+       "      <td>Yea</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>Tuberville</td>\n",
+       "      <td>Alabama</td>\n",
+       "      <td>R</td>\n",
+       "      <td>Yea</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>Murkowski</td>\n",
+       "      <td>Alaska</td>\n",
+       "      <td>R</td>\n",
+       "      <td>Yea</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>Sullivan</td>\n",
+       "      <td>Alaska</td>\n",
+       "      <td>R</td>\n",
+       "      <td>Not Voting</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>Kelly</td>\n",
+       "      <td>Arizona</td>\n",
+       "      <td>D</td>\n",
+       "      <td>Nay</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>...</th>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>95</th>\n",
+       "      <td>Manchin</td>\n",
+       "      <td>West Virginia</td>\n",
+       "      <td>D</td>\n",
+       "      <td>Yea</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>96</th>\n",
+       "      <td>Baldwin</td>\n",
+       "      <td>Wisconsin</td>\n",
+       "      <td>D</td>\n",
+       "      <td>Nay</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>97</th>\n",
+       "      <td>Johnson</td>\n",
+       "      <td>Wisconsin</td>\n",
+       "      <td>R</td>\n",
+       "      <td>Yea</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>98</th>\n",
+       "      <td>Barrasso</td>\n",
+       "      <td>Wyoming</td>\n",
+       "      <td>R</td>\n",
+       "      <td>Yea</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>99</th>\n",
+       "      <td>Lummis</td>\n",
+       "      <td>Wyoming</td>\n",
+       "      <td>R</td>\n",
+       "      <td>Yea</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>100 rows × 4 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   Person_Name     State_Name Party_Name        Vote\n",
+       "0       Shelby        Alabama          R         Yea\n",
+       "1   Tuberville        Alabama          R         Yea\n",
+       "2    Murkowski         Alaska          R         Yea\n",
+       "3     Sullivan         Alaska          R  Not Voting\n",
+       "4        Kelly        Arizona          D         Nay\n",
+       "..         ...            ...        ...         ...\n",
+       "95     Manchin  West Virginia          D         Yea\n",
+       "96     Baldwin      Wisconsin          D         Nay\n",
+       "97     Johnson      Wisconsin          R         Yea\n",
+       "98    Barrasso        Wyoming          R         Yea\n",
+       "99      Lummis        Wyoming          R         Yea\n",
+       "\n",
+       "[100 rows x 4 columns]"
+      ]
+     },
+     "execution_count": 26,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "import pandas as pd\n",
+    "df=pd.read_excel(\"USA Senate Scraped Data.xlsx\")\n",
+    "df"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 33,
+   "id": "7a2ccd63",
+   "metadata": {},
+   "outputs": [
+    {
+   
